@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shell_gpt"
-version = "0.0.0"
+version = "0.0.1"
 description = "A command-line productivity tool powered by large language models, will help you accomplish your tasks faster and more efficiently."
 authors = ["Farkhod Sadykov <farkhod@sadykov.dev>"]
 readme = "README.md"
