@@ -46,6 +46,7 @@ lint = { sequence = [{shell = "ruff ."}, {shell = "mypy ."}], help = "Run linter
 format = { sequence = [{shell = "isort ."}, {shell = "black ."}, {shell = "codespell ."}], help = "Format code" }
 install_dev = { cmd = "poetry install --with dev", help = "Install development dependencies" }
 ci = { sequence = ["format", "lint", "test"], help = "Run all code quality checks (format, lint, test) in preparation for commit" }
+publish = { cmd = "pip install . --force-reinstall", help = "Install the local package globally for development" }
 
 [tool.poetry.dependencies]
 python = ">=3.10"

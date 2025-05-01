@@ -170,48 +170,21 @@ def display_usage_instructions():
 
 
 def install_globally(verbose=False):
-    """Install ShellGPT globally."""
-    print("\nInstalling ShellGPT globally...")
-    
-    # Build the package
-    print("Building package...")
-    build_cmd = ["poetry", "build"]
-    if verbose:
-        result = subprocess.run(build_cmd)
-    else:
-        result = subprocess.run(build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    if result.returncode != 0:
-        print("Error: Failed to build package.")
-        if not verbose:
-            print("Try running with --verbose for more information.")
-        sys.exit(1)
-    
-    # Install the package globally
-    print("Installing package globally...")
-    # Find the wheel file
-    dist_dir = Path("dist")
-    wheel_files = list(dist_dir.glob("*.whl"))
-    if not wheel_files:
-        print("Error: No wheel file found in dist directory.")
-        sys.exit(1)
-    
-    # Use the latest wheel file (in case there are multiple)
-    wheel_file = str(sorted(wheel_files, key=lambda x: x.stat().st_mtime, reverse=True)[0])
-    
-    install_cmd = [sys.executable, "-m", "pip", "install", wheel_file]
+    """Install ShellGPT globally from the local source using pip install ."""
+    print("\nInstalling ShellGPT globally from local source with pip install . ...")
+    install_cmd = [
+        sys.executable, "-m", "pip", "install", ".", "--force-reinstall"
+    ]
     if verbose:
         result = subprocess.run(install_cmd)
     else:
         result = subprocess.run(install_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
     if result.returncode != 0:
-        print("Error: Failed to install package globally.")
+        print("Error: Failed to install package globally from local source.")
         if not verbose:
             print("Try running with --verbose for more information.")
         sys.exit(1)
-    
-    print("✓ ShellGPT has been successfully installed globally!")
+    print("✓ ShellGPT has been successfully installed globally from your local source!")
     print("  You can now run 'sgpt' directly from anywhere.")
 
 

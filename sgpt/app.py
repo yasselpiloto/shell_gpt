@@ -326,7 +326,9 @@ def main(
 
 
 def entry_point() -> None:
-    app()
+    # Run the main command directly, so all options are available at the root level.
+    from typer import run
+    run(main)
 
 
 if __name__ == "__main__":

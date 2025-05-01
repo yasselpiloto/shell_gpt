@@ -10,8 +10,7 @@ https://github.com/TheR1D/shell_gpt/assets/16740832/9197283c-db6a-4b46-bfea-3eb7
 pip install shell-gpt
 ```
 
-### Option 2: Install locally with Poetry
-If you prefer to install locally using Poetry or want to contribute to the project:
+### Option 2: Install locally for development (Recommended for contributors)
 
 1. Clone the repository:
 ```shell
@@ -19,7 +18,7 @@ git clone https://github.com/TheR1D/shell_gpt.git
 cd shell_gpt
 ```
 
-2. Run the installation script:
+2. Install dependencies and set up the virtual environment:
 ```shell
 python install.py
 ```
@@ -45,6 +44,26 @@ options:
   --global              Install ShellGPT globally (makes 'sgpt' available as a direct command) (default: False)
 ```
 
+#### Quick Local Global Install
+
+To install your local version globally (for development), run:
+```shell
+pip install . --force-reinstall
+```
+This guarantees your local code is installed, never a remote version from PyPI.
+
+Or, use the provided Poe task:
+```shell
+poe publish
+```
+This runs the same pip install command for you.
+
+Alternatively, you can use the install script:
+```shell
+python install.py --global
+```
+This now uses `pip install . --force-reinstall` under the hood.
+
 After installation, you can run ShellGPT using one of these methods:
 
 1. Using Poetry run (default installation):
@@ -58,7 +77,7 @@ poetry shell
 sgpt "Your prompt here"
 ```
 
-3. Global installation (if installed with `--global` flag):
+3. Global installation (if installed with `--global` flag, `pip install .`, or `poe publish`):
 ```shell
 sgpt "Your prompt here"  # Run directly from anywhere
 ```
