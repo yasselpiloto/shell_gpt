@@ -4,9 +4,52 @@ A command-line productivity tool powered by AI large language models (LLM). This
 https://github.com/TheR1D/shell_gpt/assets/16740832/9197283c-db6a-4b46-bfea-3eb776dd9093
 
 ## Installation
+
+### Option 1: Install via pip (Recommended for most users)
 ```shell
 pip install shell-gpt
 ```
+
+### Option 2: Install locally with Poetry
+If you prefer to install locally using Poetry or want to contribute to the project:
+
+1. Clone the repository:
+```shell
+git clone https://github.com/TheR1D/shell_gpt.git
+cd shell_gpt
+```
+
+2. Run the installation script:
+```shell
+python install.py
+```
+
+This script will:
+- Check if your Python version meets the requirements (>=3.10)
+- Install Poetry if it's not already installed
+- Install ShellGPT and its dependencies locally
+- Configure a virtual environment in the project directory
+
+The installation script supports several command-line options:
+```
+python install.py --help                # Show help information
+python install.py --verbose             # Show detailed output during installation
+python install.py --skip-checks         # Skip prerequisite checks
+python install.py --no-venv-in-project  # Don't configure Poetry to create virtualenvs in the project directory
+```
+
+After installation, you can run ShellGPT using:
+```shell
+poetry run sgpt "Your prompt here"
+```
+
+Or activate the virtual environment and run it directly:
+```shell
+poetry shell
+sgpt "Your prompt here"
+```
+
+### API Key Setup
 By default, ShellGPT uses OpenAI's API and GPT-4 model. You'll need an API key, you can generate one [here](https://beta.openai.com/account/api-keys). You will be prompted for your key which will then be stored in `~/.config/shell_gpt/.sgptrc`. OpenAI API is not free of charge, please refer to the [OpenAI pricing](https://openai.com/pricing) for more information.
 
 > [!TIP]
@@ -58,6 +101,35 @@ Have you ever found yourself forgetting common shell commands, such as `find`, a
 sgpt --shell "find all json files in current folder"
 # -> find . -type f -name "*.json"
 # -> [E]xecute, [D]escribe, [A]bort: e
+```
+
+You can use the `--auto-approve` option to automatically execute shell commands without prompting. However, for safety reasons, potentially unsafe commands will still require confirmation even with auto-approve enabled:
+```shell
+sgpt --shell --auto-approve "find all json files in current folder"
+# -> find . -type f -name "*.json"
+# Command automatically executed
+
+sgpt --shell --auto-approve "remove all log files"
+# -> rm -f *.log
+# -> Potentially unsafe command detected:
+# -> rm -f *.log
+# -> [E]xecute, [A]bort: 
+```
+
+You can configure which commands should always require confirmation and which commands can be automatically approved using the `safety_config` command:
+```shell
+# Show current safety configuration
+sgpt safety_config --show
+
+# Add commands to always-approve list
+sgpt safety_config --add-approve find grep
+
+# Add commands to always-confirm list
+sgpt safety_config --add-confirm rm mv
+
+# Remove commands from lists
+sgpt safety_config --remove-approve grep
+sgpt safety_config --remove-confirm mv
 ```
 
 Shell GPT is aware of OS and `$SHELL` you are using, it will provide shell command for specific system you have. For instance, if you ask `sgpt` to update your system, it will return a command based on your OS. Here's an example using macOS:
@@ -230,6 +302,14 @@ sgpt --show-chat conversation_1
 
 ### REPL Mode  
 There is very handy REPL (read–eval–print loop) mode, which allows you to interactively chat with GPT models. To start a chat session in REPL mode, use the `--repl` option followed by a unique session name. You can also use "temp" as a session name to start a temporary REPL session. Note that `--chat` and `--repl` are using same underlying object, so you can use `--chat` to start a chat session and then pick it up with `--repl` to continue the conversation in REPL mode.
+
+When using REPL mode with the shell role, you can enable auto-approve with the `--auto-approve` flag:
+```shell
+sgpt --repl temp --shell --auto-approve
+# Entering shell REPL mode with auto-approve enabled, commands will execute automatically. Press Ctrl+C to exit.
+```
+
+With auto-approve enabled, safe commands will execute automatically, while potentially unsafe commands will still require confirmation. This safety feature helps prevent accidental execution of destructive commands.
 
 <p align="center">
   <img src="https://s10.gifyu.com/images/repl-demo.gif" alt="gif">
@@ -434,6 +514,8 @@ Possible options for `CODE_THEME`: https://pygments.org/styles/
 ╭─ Assistance Options ─────────────────────────────────────────────────────────────────────────────────────╮
 │ --shell           -s                      Generate and execute shell commands.                           │
 │ --interaction         --no-interaction    Interactive mode for --shell option. [default: interaction]    │
+│ --auto-approve                            Auto-approve and execute commands in REPL mode without         │
+│                                           prompting.                                                     │
 │ --describe-shell  -d                      Describe a shell command.                                      │
 │ --code            -c                      Generate only code.                                            │
 │ --functions           --no-functions      Allow function calls. [default: functions]                     │

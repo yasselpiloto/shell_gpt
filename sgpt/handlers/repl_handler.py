@@ -1,9 +1,11 @@
 from typing import Any
 
 import typer
+from click.types import Choice
 from rich import print as rich_print
 from rich.rule import Rule
 
+from ..command_safety import is_safe_to_auto_execute
 from ..role import DefaultRoles, SystemRole
 from ..utils import run_command
 from .chat_handler import ChatHandler
@@ -76,11 +78,31 @@ class ReplHandler(ChatHandler):
 
                 # Auto-execute if auto_approve is enabled and in shell mode
                 if self.auto_approve and self.role.name == DefaultRoles.SHELL.value:
-                    typer.echo()
-                    command_output = run_command(full_completion)
-                    # Add command output to chat context
-                    self.add_system_message(
-                        f"Shell command executed:\n```\n{command_output}\n```"
-                    )
+                    # Check if the command is safe to auto-execute
+                    if is_safe_to_auto_execute(full_completion, self.auto_approve):
+                        typer.echo()
+                        command_output = run_command(full_completion)
+                        # Add command output to chat context
+                        self.add_system_message(
+                            f"Shell command executed:\n```\n{command_output}\n```"
+                        )
+                    else:
+                        # Unsafe command detected - ask for confirmation
+                        typer.secho("Potentially unsafe command detected:", fg="yellow")
+                        typer.echo(full_completion)
+                        option = typer.prompt(
+                            text="[E]xecute, [A]bort",
+                            type=Choice(("e", "a"), case_sensitive=False),
+                            default="a",
+                            show_choices=False,
+                            show_default=False,
+                        )
+                        if option.lower() == "e":
+                            typer.echo()
+                            command_output = run_command(full_completion)
+                            # Add command output to chat context
+                            self.add_system_message(
+                                f"Shell command executed:\n```\n{command_output}\n```"
+                            )
                     typer.echo()
                     rich_print(Rule(style="bold magenta"))

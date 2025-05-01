@@ -1871,7 +1871,6 @@ files = [
     {file = "PyYAML-6.0.2-cp39-cp39-win_amd64.whl", hash = "sha256:39693e1f8320ae4f43943590b49779ffb98acb81f788220ea932a6b6c51004d8"},
     {file = "pyyaml-6.0.2.tar.gz", hash = "sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e"},
 ]
-markers = {main = "extra == \"litellm\""}
 
 [[package]]
 name = "referencing"
@@ -2658,4 +2657,4 @@ litellm = ["litellm"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "943776c7739ce53c573372e788305da573a0bf09ec4d7a6a31c26e8692bc962c"
+content-hash = "59c7ddfaccb457465990413f9606e092cbc493570a61045ea0ec0ed85598ae30"

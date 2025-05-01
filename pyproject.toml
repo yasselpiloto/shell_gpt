@@ -57,6 +57,7 @@ distro = ">=1.8.0,<2.0.0"
 instructor = {version = ">=1.0.0,<2.0.0", python = ">=3.10,<4.0"}
 pyreadline3 = {version = ">=3.4.1,<4.0.0", platform = "win32"}
 litellm = {version = "==1.42.5", optional = true}
+pyyaml = ">=6.0.0,<7.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "==0.0.256"

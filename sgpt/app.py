@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 # To allow users to use arrow keys in the REPL.
 import readline  # noqa: F401
@@ -8,6 +9,13 @@ import typer
 from click import BadArgumentUsage
 from click.types import Choice
 
+from sgpt.command_safety import (
+    add_to_approve_list,
+    add_to_confirm_list,
+    get_safety_config_display,
+    remove_from_approve_list,
+    remove_from_confirm_list,
+)
 from sgpt.config import cfg
 from sgpt.function import get_openai_schemas
 from sgpt.handlers.chat_handler import ChatHandler
@@ -23,6 +31,56 @@ from sgpt.utils import (
 )
 
 
+app = typer.Typer()
+
+
+@app.command()
+def safety_config(
+    add_to_approve: List[str] = typer.Option(
+        [], "--add-approve", help="Add commands to always-approve list"
+    ),
+    add_to_confirm: List[str] = typer.Option(
+        [], "--add-confirm", help="Add commands to always-confirm list"
+    ),
+    remove_from_approve: List[str] = typer.Option(
+        [], "--remove-approve", help="Remove commands from always-approve list"
+    ),
+    remove_from_confirm: List[str] = typer.Option(
+        [], "--remove-confirm", help="Remove commands from always-confirm list"
+    ),
+    show: bool = typer.Option(
+        False, "--show", "-s", help="Show current safety configuration"
+    ),
+) -> None:
+    """
+    Manage command safety configuration for auto-approve feature.
+    
+    This command allows you to configure which commands should always require confirmation
+    and which commands can be automatically approved when using --auto-approve.
+    """
+    # Process command additions/removals
+    if add_to_approve:
+        add_to_approve_list(add_to_approve)
+        typer.echo(f"Added {', '.join(add_to_approve)} to always-approve list")
+    
+    if add_to_confirm:
+        add_to_confirm_list(add_to_confirm)
+        typer.echo(f"Added {', '.join(add_to_confirm)} to always-confirm list")
+    
+    if remove_from_approve:
+        remove_from_approve_list(remove_from_approve)
+        typer.echo(f"Removed {', '.join(remove_from_approve)} from always-approve list")
+    
+    if remove_from_confirm:
+        remove_from_confirm_list(remove_from_confirm)
+        typer.echo(f"Removed {', '.join(remove_from_confirm)} from always-confirm list")
+    
+    # Show configuration if requested or if no other action was performed
+    if show or not any([add_to_approve, add_to_confirm, remove_from_approve, remove_from_confirm]):
+        typer.echo(get_safety_config_display())
+
+
+@app.command()
 def main(
     prompt: str = typer.Argument(
         "",
@@ -268,7 +326,7 @@ def main(
 
 
 def entry_point() -> None:
-    typer.run(main)
+    app()
 
 
 if __name__ == "__main__":
