@@ -61,6 +61,12 @@ def main(
         help="Interactive mode for --shell option.",
         rich_help_panel="Assistance Options",
     ),
+    auto_approve: bool = typer.Option(
+        False,
+        "--auto-approve",
+        help="Auto-approve and execute commands in REPL mode without prompting.",
+        rich_help_panel="Assistance Options",
+    ),
     describe_shell: bool = typer.Option(
         False,
         "--describe-shell",
@@ -209,7 +215,7 @@ def main(
 
     if repl:
         # Will be in infinite loop here until user exits with Ctrl+C.
-        ReplHandler(repl, role_class, md).handle(
+        ReplHandler(repl, role_class, md, auto_approve).handle(
             init_prompt=prompt,
             model=model,
             temperature=temperature,

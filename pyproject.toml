@@ -8,6 +8,8 @@ license = "MIT"
 repository = "https://github.com/ther1d/shell_gpt"
 documentation = "https://github.com/TheR1D/shell_gpt/blob/main/README.md"
 keywords = ["shell", "gpt", "openai", "ollama", "cli", "productivity", "cheet-sheet"]
+
+packages = [{include = "sgpt"}]
 classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Software Development",
@@ -20,7 +22,30 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-packages = [{include = "sgpt"}]
+
+[tool.poetry.extras]
+litellm = ["litellm"]
+
+[tool.poetry.scripts]
+sgpt = "sgpt:cli"
+
+[tool.isort]
+profile = "black"
+skip = "__init__.py"
+
+[tool.mypy]
+strict = true
+exclude = ["build"]
+
+[tool.codespell]
+skip = '.git,venv'
+
+[tool.poe.tasks]
+test = { cmd = "pytest tests -p no:warnings", help = "Run tests" }
+lint = { sequence = [{shell = "ruff ."}, {shell = "mypy ."}], help = "Run linters" }
+format = { sequence = [{shell = "isort ."}, {shell = "black ."}, {shell = "codespell ."}], help = "Format code" }
+install_dev = { cmd = "poetry install --with dev", help = "Install development dependencies" }
+ci = { sequence = ["format", "lint", "test"], help = "Run all code quality checks (format, lint, test) in preparation for commit" }
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -44,41 +69,3 @@ mypy = "==1.1.1"
 types-requests = "==2.28.11.17"
 codespell = ">=2.2.5,<3.0.0"
 poethepoet = "^0.34.0"
-
-[tool.poetry.extras]
-litellm = ["litellm"]
-
-[tool.poetry.scripts]
-sgpt = "sgpt:cli"
-
-[tool.isort]
-profile = "black"
-skip = "__init__.py"
-
-[tool.mypy]
-strict = true
-exclude = ["llm_functions"]
-
-[tool.ruff]
-select = [
-    "E",  # pycodestyle errors.
-    "W",  # pycodestyle warnings.
-    "F",  # pyflakes.
-    "C",  # flake8-comprehensions.
-    "B",  # flake8-bugbear.
-]
-ignore = [
-    "E501",  # line too long, handled by black.
-    "C901",  # too complex.
-    "B008",  # do not perform function calls in argument defaults.
-    "E731",  # do not assign a lambda expression, use a def.
-]
-
-[tool.codespell]
-skip = '.git,venv'
-
-[tool.poe.tasks]
-test = { cmd = "pytest tests -p no:warnings", help = "Run tests" }
-lint = { sequence = [{shell = "ruff ."}, {shell = "mypy ."}], help = "Run linters" }
-format = { sequence = [{shell = "isort ."}, {shell = "black ."}, {shell = "codespell ."}], help = "Format code" }
-install_dev = { cmd = "poetry install --with dev", help = "Install development dependencies" }

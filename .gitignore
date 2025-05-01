@@ -1,3 +1,5 @@
 *__pycache__*
 .memory-bank
 .clinerules
+*.egg-info
+build

@@ -11,8 +11,11 @@ from .default_handler import DefaultHandler
 
 
 class ReplHandler(ChatHandler):
-    def __init__(self, chat_id: str, role: SystemRole, markdown: bool) -> None:
+    def __init__(
+        self, chat_id: str, role: SystemRole, markdown: bool, auto_approve: bool = False
+    ) -> None:
         super().__init__(chat_id, role, markdown)
+        self.auto_approve = auto_approve
 
     @classmethod
     def _get_multiline_input(cls) -> str:
@@ -31,7 +34,9 @@ class ReplHandler(ChatHandler):
             "Entering REPL mode, press Ctrl+C to exit."
             if not self.role.name == DefaultRoles.SHELL.value
             else (
-                "Entering shell REPL mode, type [e] to execute commands "
+                "Entering shell REPL mode with auto-approve enabled, commands will execute automatically. Press Ctrl+C to exit."
+                if self.auto_approve
+                else "Entering shell REPL mode, type [e] to execute commands "
                 "or [d] to describe the commands, press Ctrl+C to exit."
             )
         )
@@ -68,3 +73,14 @@ class ReplHandler(ChatHandler):
                 ).handle(prompt=full_completion, **kwargs)
             else:
                 full_completion = super().handle(prompt=prompt, **kwargs)
+
+                # Auto-execute if auto_approve is enabled and in shell mode
+                if self.auto_approve and self.role.name == DefaultRoles.SHELL.value:
+                    typer.echo()
+                    command_output = run_command(full_completion)
+                    # Add command output to chat context
+                    self.add_system_message(
+                        f"Shell command executed:\n```\n{command_output}\n```"
+                    )
+                    typer.echo()
+                    rich_print(Rule(style="bold magenta"))
