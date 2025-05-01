@@ -31,22 +31,36 @@ This script will:
 - Configure a virtual environment in the project directory
 
 The installation script supports several command-line options:
-```
-python install.py --help                # Show help information
-python install.py --verbose             # Show detailed output during installation
-python install.py --skip-checks         # Skip prerequisite checks
-python install.py --no-venv-in-project  # Don't configure Poetry to create virtualenvs in the project directory
+
+```text
+usage: install.py [-h] [--skip-checks] [--verbose] [--no-venv-in-project] [--global]
+
+ShellGPT Installation Script
+
+options:
+  -h, --help            show this help message and exit
+  --skip-checks         Skip prerequisite checks and proceed directly to installation (default: False)
+  --verbose             Show detailed output during installation (default: False)
+  --no-venv-in-project  Don't configure Poetry to create virtualenvs in the project directory (default: False)
+  --global              Install ShellGPT globally (makes 'sgpt' available as a direct command) (default: False)
 ```
 
-After installation, you can run ShellGPT using:
+After installation, you can run ShellGPT using one of these methods:
+
+1. Using Poetry run (default installation):
 ```shell
 poetry run sgpt "Your prompt here"
 ```
 
-Or activate the virtual environment and run it directly:
+2. Activating the Poetry shell:
 ```shell
 poetry shell
 sgpt "Your prompt here"
+```
+
+3. Global installation (if installed with `--global` flag):
+```shell
+sgpt "Your prompt here"  # Run directly from anywhere
 ```
 
 ### API Key Setup

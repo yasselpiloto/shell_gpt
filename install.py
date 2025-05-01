@@ -29,6 +29,12 @@ def parse_arguments():
         action="store_true",
         help="Don't configure Poetry to create virtualenvs in the project directory"
     )
+    parser.add_argument(
+        "--global", 
+        action="store_true",
+        dest="global_install",
+        help="Install ShellGPT globally (makes 'sgpt' available as a direct command)"
+    )
     return parser.parse_args()
 
 
@@ -163,6 +169,52 @@ def display_usage_instructions():
     print("  pip install dist/*.whl")
 
 
+def install_globally(verbose=False):
+    """Install ShellGPT globally."""
+    print("\nInstalling ShellGPT globally...")
+    
+    # Build the package
+    print("Building package...")
+    build_cmd = ["poetry", "build"]
+    if verbose:
+        result = subprocess.run(build_cmd)
+    else:
+        result = subprocess.run(build_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    if result.returncode != 0:
+        print("Error: Failed to build package.")
+        if not verbose:
+            print("Try running with --verbose for more information.")
+        sys.exit(1)
+    
+    # Install the package globally
+    print("Installing package globally...")
+    # Find the wheel file
+    dist_dir = Path("dist")
+    wheel_files = list(dist_dir.glob("*.whl"))
+    if not wheel_files:
+        print("Error: No wheel file found in dist directory.")
+        sys.exit(1)
+    
+    # Use the latest wheel file (in case there are multiple)
+    wheel_file = str(sorted(wheel_files, key=lambda x: x.stat().st_mtime, reverse=True)[0])
+    
+    install_cmd = [sys.executable, "-m", "pip", "install", wheel_file]
+    if verbose:
+        result = subprocess.run(install_cmd)
+    else:
+        result = subprocess.run(install_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    if result.returncode != 0:
+        print("Error: Failed to install package globally.")
+        if not verbose:
+            print("Try running with --verbose for more information.")
+        sys.exit(1)
+    
+    print("✓ ShellGPT has been successfully installed globally!")
+    print("  You can now run 'sgpt' directly from anywhere.")
+
+
 def main():
     """Main installation process."""
     args = parse_arguments()
@@ -188,8 +240,13 @@ def main():
     # Step 5: Install ShellGPT
     install_shellgpt(verbose=args.verbose)
     
-    # Step 6: Show usage instructions
-    display_usage_instructions()
+    # Step 6: Install globally if requested
+    if args.global_install:
+        install_globally(verbose=args.verbose)
+    
+    # Step 7: Show usage instructions
+    if not args.global_install:
+        display_usage_instructions()
     
     print("\nInstallation complete!")
 

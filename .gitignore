@@ -3,3 +3,4 @@
 .clinerules
 *.egg-info
 build
+dist/
