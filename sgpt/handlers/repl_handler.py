@@ -55,7 +55,11 @@ class ReplHandler(ChatHandler):
                 init_prompt = ""
             if self.role.name == DefaultRoles.SHELL.value and prompt == "e":
                 typer.echo()
-                run_command(full_completion)
+                command_output = run_command(full_completion)
+                # Add command output to chat context
+                self.add_system_message(
+                    f"Shell command executed:\n```\n{command_output}\n```"
+                )
                 typer.echo()
                 rich_print(Rule(style="bold magenta"))
             elif self.role.name == DefaultRoles.SHELL.value and prompt == "d":

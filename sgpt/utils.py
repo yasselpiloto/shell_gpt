@@ -1,6 +1,7 @@
 import os
 import platform
 import shlex
+import subprocess
 from tempfile import NamedTemporaryFile
 from typing import Any, Callable
 
@@ -33,11 +34,12 @@ def get_edited_prompt() -> str:
     return output
 
 
-def run_command(command: str) -> None:
+def run_command(command: str) -> str:
     """
-    Runs a command in the user's shell.
+    Runs a command in the user's shell and returns the output.
     It is aware of the current user's $SHELL.
     :param command: A shell command to run.
+    :return: The command output as a string.
     """
     if platform.system() == "Windows":
         is_powershell = len(os.getenv("PSModulePath", "").split(os.pathsep)) >= 3
@@ -50,7 +52,19 @@ def run_command(command: str) -> None:
         shell = os.environ.get("SHELL", "/bin/sh")
         full_command = f"{shell} -c {shlex.quote(command)}"
 
-    os.system(full_command)
+    process = subprocess.Popen(
+        full_command,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    output, _ = process.communicate()
+    exit_code = process.returncode
+
+    typer.echo(output)
+
+    return f"Command: {command}\nExit code: {exit_code}\nOutput:\n{output}"
 
 
 def option_callback(func: Callable) -> Callable:  # type: ignore

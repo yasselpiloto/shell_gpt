@@ -72,7 +72,9 @@ class ChatSession:
     def _write(self, messages: List[Dict[str, str]], chat_id: str) -> None:
         file_path = self.storage_path / chat_id
         # Retain the first message since it defines the role
-        truncated_messages = messages[:1] + messages[1 + max(0, len(messages) - self.length):]
+        truncated_messages = (
+            messages[:1] + messages[1 + max(0, len(messages) - self.length) :]
+        )
         json.dump(truncated_messages, file_path.open("w"))
 
     def invalidate(self, chat_id: str) -> None:
@@ -175,3 +177,15 @@ class ChatHandler(Handler):
 
     def handle(self, **kwargs: Any) -> str:  # type: ignore[override]
         return super().handle(**kwargs, chat_id=self.chat_id)
+
+    def add_system_message(self, content: str) -> None:
+        """
+        Adds a system message to the chat history.
+        :param content: The content of the system message.
+        """
+        if not self.chat_id:
+            return
+
+        previous_messages = self.chat_session._read(self.chat_id)
+        previous_messages.append({"role": "system", "content": content})
+        self.chat_session._write(previous_messages, self.chat_id)
