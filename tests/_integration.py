@@ -323,6 +323,30 @@ class TestShellGpt(TestCase):
             "You are Shell Command Descriptor"
         )
 
+    def test_repl_auto_approve_abort(self):
+        """
+        Test that in REPL mode with auto-approve, aborting an unsafe command shows a confirmation message.
+        """
+        dict_arguments = {
+            "prompt": "",
+            "--repl": f"test_{uuid4()}",
+            "--shell": True,
+            "--auto-approve": True,
+        }
+        # Simulate an unsafe command (e.g., "rm -rf /") and abort
+        inputs = [
+            "rm -rf /",  # This should trigger the unsafe command prompt
+            "",          # Press Enter to abort (default)
+            "exit()",
+        ]
+        result = runner.invoke(
+            app, self.get_arguments(**dict_arguments), input="\n".join(inputs)
+        )
+        assert result.exit_code == 0
+        assert "Potentially unsafe command detected:" in result.stdout
+        assert "rm -rf /" in result.stdout
+        assert "Command aborted." in result.stdout
+
     def test_repl_code(self):
         dict_arguments = {
             "prompt": "",

@@ -104,5 +104,7 @@ class ReplHandler(ChatHandler):
                             self.add_system_message(
                                 f"Shell command executed:\n```\n{command_output}\n```"
                             )
+                        else:
+                            typer.secho("Command aborted.", fg="red")
                     typer.echo()
                     rich_print(Rule(style="bold magenta"))
