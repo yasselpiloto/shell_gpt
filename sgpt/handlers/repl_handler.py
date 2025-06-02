@@ -10,6 +10,7 @@ from ..role import DefaultRoles, SystemRole
 from ..utils import run_command
 from .chat_handler import ChatHandler
 from .default_handler import DefaultHandler
+from .question_handler import QuestionHandler
 
 
 class ReplHandler(ChatHandler):
@@ -60,7 +61,24 @@ class ReplHandler(ChatHandler):
             if init_prompt:
                 prompt = f"{init_prompt}\n\n\n{prompt}"
                 init_prompt = ""
-            if self.role.name == DefaultRoles.SHELL.value and prompt == "e":
+            
+            # Check for question mode trigger (??)
+            if prompt.endswith('??'):
+                # Ensure chat has system message if this is the first interaction
+                if not self.initiated:
+                    # Add system message to establish chat role before adding questions
+                    self.add_message({"role": "system", "content": self.role.role})
+                
+                # Route to QuestionHandler for general questions
+                question_handler = QuestionHandler(
+                    DefaultRoles.DEFAULT.get_role(),  # Use default role for questions
+                    self.markdown
+                )
+                question_response = question_handler.handle(prompt=prompt, **kwargs)
+                # Add question and response to chat context for continuity
+                self.add_message({"role": "user", "content": prompt})
+                self.add_message({"role": "assistant", "content": question_response})
+            elif self.role.name == DefaultRoles.SHELL.value and prompt == "e":
                 typer.echo()
                 command_output = run_command(full_completion)
                 # Add command output to chat context

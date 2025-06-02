@@ -26,6 +26,21 @@ pip install -e ."[dev,test]"
 ### Start Coding
 With your environment set up and the issue assigned, you can start working on your solution. Get to know the existing codebase and adhere to the project's coding style and conventions. Write clean, modular, and maintainable code to facilitate understanding and review. Commit your changes frequently to document your progress.
 
+### Run Tests After Changes
+**Always run the test suite after implementing any changes.** This ensures your modifications don't break existing functionality:
+
+```shell
+poetry run pytest tests/
+```
+
+Or use the provided script:
+
+```shell
+./scripts/test.sh
+```
+
+All tests must pass before submitting your pull request.
+
 ### Testing
 **This is a crucial step.** Any changes that implement a new feature or modify existing features should include tests. **Unverified code will not be merged.** These tests should call `sgpt` with defined arguments, capture the output, and verify that the feature works as expected. Refer to the `tests` folder for examples.
 

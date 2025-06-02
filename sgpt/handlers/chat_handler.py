@@ -189,3 +189,15 @@ class ChatHandler(Handler):
         previous_messages = self.chat_session._read(self.chat_id)
         previous_messages.append({"role": "system", "content": content})
         self.chat_session._write(previous_messages, self.chat_id)
+
+    def add_message(self, message: Dict[str, str]) -> None:
+        """
+        Adds a message to the chat history.
+        :param message: Dictionary containing 'role' and 'content' keys.
+        """
+        if not self.chat_id:
+            return
+
+        previous_messages = self.chat_session._read(self.chat_id)
+        previous_messages.append(message)
+        self.chat_session._write(previous_messages, self.chat_id)
